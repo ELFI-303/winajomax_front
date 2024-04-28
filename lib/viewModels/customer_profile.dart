@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:todospring/Screens/gamble_screen.dart';
-import 'package:todospring/Screens/shopping_cart_screen.dart';
+import 'package:todospring/Screens/home_screen.dart';
+import 'package:todospring/models/gamble.dart';
 
 import '../models/customer.dart';
 
 class CustomerProfile extends StatelessWidget {
-  final Customer customer;
-
-  const CustomerProfile({Key? key, required this.customer})
+  const CustomerProfile({Key? key, required this.customer, required this.gambleList})
       : super(key: key);
+  final Customer customer;
+  final List<Gamble> gambleList;
+
 
   @override
   Widget build(BuildContext context) {
@@ -24,13 +25,9 @@ class CustomerProfile extends StatelessWidget {
             Text('Name: ${customer.customerName}'),
             Text('Email: ${customer.customerEmail}'),
             Text('Solde: ${customer.customerSolde}€'),
-            TextButton(child: Text('Historique des paris'),onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => GambleScreen()),
-                                      );
-              
-            },)
+            TextButton(child: Text('Historique des paris',style: TextStyle(color: Color.fromARGB(255, 49, 41, 25))),
+                        style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Color.fromARGB(255, 226, 191, 114))),
+                        onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(gambleList: gambleList,page:0,isAuthenticated: true)),);},)
             // Add more profile details here
           ],
         ),

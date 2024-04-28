@@ -1,4 +1,3 @@
-import 'dart:convert';
 class Olympic {
   final int eventId;
   final String discipline;
@@ -18,9 +17,9 @@ class Olympic {
     required this.cote,
   });
 
-  factory Olympic.fromMap(Map<String,dynamic> olympicMap) {
-    dynamic participantsJSON = json.decode(olympicMap['participants']) as dynamic;
-    dynamic coteJSON = json.decode(olympicMap['cote']) as dynamic;
+  factory Olympic.fromMap(Map olympicMap) {
+    dynamic participantsJSON = olympicMap['participants'] as dynamic;
+    dynamic coteJSON = olympicMap['cote'] as dynamic;
     String resultJSON = olympicMap['result'] as String;
     String lieuJSON = olympicMap['lieu'] as String;
     String datetimeJSON = olympicMap['dateTime'] as String;
