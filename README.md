@@ -1,6 +1,6 @@
 # WinaJoMax
 
-A new Flutter application.
+A new Flutter application made to instanciate gambles for the 2024 Paris Olympics.
 
 ## Getting Started
 
