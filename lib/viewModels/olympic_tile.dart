@@ -9,9 +9,11 @@ import 'package:todospring/models/gamble.dart';
 import '/models/olympic.dart';
 
 class OlympicTile extends StatelessWidget {
-  OlympicTile({Key? key, required this.olympic,required this.gambleList}) : super(key: key);
+  OlympicTile({Key? key, required this.olympic,required this.gambleList, required this.username, required this.password}) : super(key: key);
   List<Gamble> gambleList;
   List<Gamble> gamblesOlist = [];
+  final String username;
+  final String password;
   final Olympic olympic;
   final cuntroller = TextEditingController();
   @override
@@ -124,7 +126,7 @@ class OlympicTile extends StatelessWidget {
                                       gamblesOlist.add(Gamble(olympicEvent: olympic, amount: amount, gambleId: 0, pay:payString));
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => HomeScreen(gambleList: gambleList+gamblesOlist,page: 1,isAuthenticated: true)),);
+                                        MaterialPageRoute(builder: (context) => HomeScreen(gambleList: gambleList+gamblesOlist,page: 1,username: username,password: password,)),);
                                     } else {
                                       showDialog(
                                         barrierDismissible: true,//tapping outside dialog will close the dialog if set 'true'

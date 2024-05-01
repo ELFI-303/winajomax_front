@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: HomeScreen(gambleList: gambleList,page:1,isAuthenticated: true),
+        home: HomeScreen(gambleList: gambleList,page:1,username: "",password: ""),
       );
   }
 }

@@ -14,10 +14,11 @@ import 'package:todospring/viewModels/olympic_tile.dart';
 import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key, required this.gambleList, required this.page, required this.isAuthenticated});
+  const HomeScreen({Key? key, required this.gambleList, required this.page, required this.username, required this.password});
   final List<Gamble> gambleList;
   final int page;
-  final bool isAuthenticated;
+  final String username;
+  final String password;
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -29,35 +30,34 @@ class _HomeScreenState extends State<HomeScreen>
   List<Olympic>? olympics;
   Customer? customer;
   List<Gamble>? gamble;
-  bool? isAuthenticated;
 
   final cuntroller = TextEditingController();
-  getAuth() {
-    isAuthenticated = DatabaseServices.getAuth();
-  }
-  getGamble(isAuth) async {
-    gamble = await DatabaseServices.getGamble(isAuth);
+  getGamble(username,password) async {
+    gamble = await DatabaseServices.getGamble(username,password);
     setState(() {});
   }
   getOlympics() async {
     olympics = await DatabaseServices.getOlympics();
     setState(() {});
   }
-  getCustomer(isAuth) async {
-    customer = await DatabaseServices.getCustomer(isAuth);
+  getCustomer(username,password) async {
+    customer = await DatabaseServices.getCustomer(username,password);
     setState(() {});
   }
-  postCart(cart,isAuth) async {
-    await DatabaseServices.postShoppingCart(cart,isAuth);
+  postCart(cart,username,password) async {
+    await DatabaseServices.postShoppingCart(cart,username,password);
   }
+  
+  final passCuntroller = TextEditingController();
+  final userCuntroller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this,initialIndex: widget.page);
-    getGamble(widget.isAuthenticated);
+    getGamble(widget.username,widget.password);
     getOlympics();
-    getCustomer(widget.isAuthenticated);
+    getCustomer(widget.username,widget.password);
   }
   @override
   void dispose() {
@@ -72,21 +72,104 @@ class _HomeScreenState extends State<HomeScreen>
       total += widget.gambleList[i].amount;
     }
     return olympics == null ? const Scaffold(body:Center(child:CircularProgressIndicator())) :
-        Scaffold(appBar: AppBar( title: const Text('WINAMAX OLYMPICS',style: TextStyle(fontWeight: FontWeight.bold,wordSpacing: 2,color:Color.fromARGB(255, 223, 209, 165),fontSize: 25,shadows: [Shadow( color: Color.fromARGB(134, 0, 0, 0),blurRadius: 2,offset: Offset(2.5, 2.5))])),
+        Scaffold(appBar: AppBar( 
+                                    title: Row(children:[
+                                              Text('WINAMAX OLYMPICS',style: TextStyle(fontWeight: FontWeight.bold,wordSpacing: 2,color:Color.fromARGB(255, 223, 209, 165),fontSize: 25,shadows: [Shadow( color: Color.fromARGB(134, 0, 0, 0),blurRadius: 2,offset: Offset(2.5, 2.5))])),
+                                              
+                                            ]),
+                                    automaticallyImplyLeading: false,
                                     backgroundColor: const Color.fromARGB(255, 49, 41, 25),
                                     toolbarHeight: sHeight*0.15,
                                     actions:[ IconButton(
                                                 onPressed: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (BuildContext context) {
-                                                      return CustomerProfile(customer: customer!,gambleList: widget.gambleList);
-                                                    },
-                                                  );
+                                                  if (gamble == null || gamble!.isEmpty == true){
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return AlertDialog(
+                                                                title: const Text('Non authentifié'),
+                                                                content: Column(
+                                                                  mainAxisSize: MainAxisSize.min,
+                                                                  children: [
+                                                                    widget.password != "" || widget.username != "" ? Text('Les identifiants enregistrés ne sont pas valide. Veuillez réessayer...',style:TextStyle(color: Colors.red))  : Text('Vous devez être authentifié pour accéder à votre profil'),
+                                                                    TextField(
+                                                                      controller: userCuntroller,
+                                                                      decoration: const InputDecoration(
+                                                                        labelText: 'Nom d\'utilisateur',
+                                                                      ),
+                                                                    ),
+                                                                    TextField(
+                                                                      controller: passCuntroller,
+                                                                      obscureText: true,
+                                                                      decoration: const InputDecoration(
+                                                                        labelText: 'Mot de passe',
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                actions: [
+                                                                  TextButton(
+                                                                    onPressed: () {
+                                                                      String username = userCuntroller.text;
+                                                                      String password = passCuntroller.text;
+                                                                      Navigator.push(
+                                                                        context,
+                                                                        MaterialPageRoute(builder: (context) => HomeScreen(gambleList: widget.gambleList,page:1,username: username,password: password)),
+                                                                      );
+                                                                    },
+                                                                    child: const Text('Se connecter'),
+                                                                  ),
+                                                                ],
+                                                              );
+                                                      },
+                                                    );
+                                                  } else {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return CustomerProfile(customer: customer!,gambleList: widget.gambleList,username: widget.username,password: widget.password);
+                                                      },
+                                                    );
+
+                                                  }
                                                 },
                                                 icon: const Icon(Icons.person),
                                                 color:Color.fromARGB(255, 223, 209, 165),
-                                              ),],
+                                              ),
+                                              gamble == null || gamble!.isEmpty == true ? SizedBox() : IconButton(
+                                                onPressed: () {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return AlertDialog(
+                                                          title: const Text('Déconnexion'),
+                                                          content: const Text('Voulez-vous vraiment vous déconnecter ?'),
+                                                          actions: [
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(context).pop();
+                                                              },
+                                                              child: const Text('Annuler'),
+                                                            ),
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(builder: (context) => HomeScreen(gambleList: [],page:1,username: "",password: "")),
+                                                                );
+                                                              },
+                                                              child: const Text('Déconnexion'),
+                                                            ),
+                                                          ],
+                                                        
+                                                        );
+                                                      },
+                                                  );
+                                                },
+                                                icon: const Icon(Icons.logout),
+                                                color:Color.fromARGB(255, 223, 209, 165),
+                                              ),
+                                              ],
                                     bottom: PreferredSize(
                                       preferredSize: const Size.fromHeight(120),
                                       child: Container(
@@ -136,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen>
             body: TabBarView(
               controller: _tabController,
               children: <Widget>[
-                Center(child: widget.isAuthenticated == false ? Text('unauthenticated') : ListView.builder(
+                Center(child: gamble == null || gamble!.isEmpty == true ? Text('Vous devez être authentifié pour accéder à vos paris') : ListView.builder(
                           itemCount: gamble!.length,
                           itemBuilder: (context, index) {
                             Gamble bet = gamble![index];
@@ -147,11 +230,11 @@ class _HomeScreenState extends State<HomeScreen>
                           itemCount: olympics!.length,
                           itemBuilder: (context, index) {
                             Olympic olympic = olympics![index];
-                            return OlympicTile(olympic: olympic,gambleList: widget.gambleList);
+                            return OlympicTile(olympic: olympic,gambleList: widget.gambleList,username: widget.username,password: widget.password);
                           },
                         ),),
                 Center(
-                  child: Column(children: widget.isAuthenticated == false ? [Text('unauthenticated')] : [
+                  child: gamble == null || gamble!.isEmpty == true ? Text('Vous devez être authentifié pour accéder au panier') : Column(children: [
                     Expanded(child:ListView.builder(
                             itemCount: widget.gambleList.length,
                             itemBuilder: (context, index) {
@@ -190,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                     list[index] = Gamble(olympicEvent: list[index].olympicEvent,amount:  amount,gambleId:  list[index].gambleId,pay: list[index].pay);
                                                     Navigator.push(
                                                       context,
-                                                      MaterialPageRoute(builder: (context) => HomeScreen(gambleList: list,page:2,isAuthenticated: true)),
+                                                      MaterialPageRoute(builder: (context) => HomeScreen(gambleList: list,page:2,username: widget.username,password: widget.password)),
                                                     );
                                                   },
                                                   child: const Text('valider'),
@@ -210,7 +293,7 @@ class _HomeScreenState extends State<HomeScreen>
                                           list.removeAt(index);
                                           Navigator.push(
                                             context,
-                                            MaterialPageRoute(builder: (context) => HomeScreen(gambleList: list,page:2,isAuthenticated: true)),
+                                            MaterialPageRoute(builder: (context) => HomeScreen(gambleList: list,page:2,username: widget.username,password: widget.password)),
                                           );
                                       });
                                     },
@@ -248,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   for (int i = 0; i < widget.gambleList.length; i++) {
                                     gambles[i] = Gamble(olympicEvent: widget.gambleList[i].olympicEvent,amount:  widget.gambleList[i].amount,gambleId:  widget.gambleList[i].gambleId,pay: widget.gambleList[i].pay);
                                   }
-                                  postCart(gambles,widget.isAuthenticated);
+                                  postCart(gambles,widget.username,widget.password);
                                   showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
@@ -264,7 +347,7 @@ class _HomeScreenState extends State<HomeScreen>
                                             TextButton(
                                               onPressed: () {
                                                 List<Gamble> list = [];
-                                                Navigator.push(context,MaterialPageRoute(builder: (context) => HomeScreen(gambleList: list,page:1,isAuthenticated: true)));
+                                                Navigator.push(context,MaterialPageRoute(builder: (context) => HomeScreen(gambleList: list,page:1,username: widget.username,password: widget.password)));
                                               },
                                               child: const Text('OK'),
                                             ),

@@ -5,10 +5,12 @@ import 'package:todospring/models/gamble.dart';
 import '../models/customer.dart';
 
 class CustomerProfile extends StatelessWidget {
-  const CustomerProfile({Key? key, required this.customer, required this.gambleList})
+  const CustomerProfile({Key? key, required this.customer, required this.gambleList, required this.username, required this.password})
       : super(key: key);
   final Customer customer;
   final List<Gamble> gambleList;
+  final String username;
+  final String password;
 
 
   @override
@@ -27,7 +29,7 @@ class CustomerProfile extends StatelessWidget {
             Text('Solde: ${customer.customerSolde}€'),
             TextButton(child: Text('Historique des paris',style: TextStyle(color: Color.fromARGB(255, 49, 41, 25))),
                         style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Color.fromARGB(255, 226, 191, 114))),
-                        onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(gambleList: gambleList,page:0,isAuthenticated: true)),);},)
+                        onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(gambleList: gambleList,page:0,username: username,password: password,)),);},)
             // Add more profile details here
           ],
         ),
