@@ -2,7 +2,7 @@
 
 Flutter application made to instanciate gambles for the 2024 Paris Olympics.
 
-[fond](https://github.com/user-attachments/assets/e006f49b-c472-41cf-a90a-a0ab127cbafc)
+![fond](https://github.com/user-attachments/assets/e006f49b-c472-41cf-a90a-a0ab127cbafc)
 
 ## Getting Started
 
